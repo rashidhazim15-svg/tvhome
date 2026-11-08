@@ -30,14 +30,22 @@ class TmdbClient(
 
     private val base = "https://api.themoviedb.org/3"
 
+    /**
+     * TMDB issues two credentials: a v4 *read access token* (long JWT, used as a Bearer
+     * token) and a v3 *API key* (32 hex chars, passed as the `api_key` query parameter).
+     * Both are accepted here so either value works in local.properties.
+     */
+    private val isApiKey = token.matches(Regex("[0-9a-fA-F]{32}"))
+
     suspend fun get(path: String, params: Map<String, String> = emptyMap()): JSONObject =
         withContext(Dispatchers.IO) {
             val url = StringBuilder(base).append(path)
-            val query = params.entries.joinToString("&") { "${it.key}=${it.value}" }
+            val allParams = if (isApiKey) params + ("api_key" to token) else params
+            val query = allParams.entries.joinToString("&") { "${it.key}=${it.value}" }
             if (query.isNotEmpty()) url.append('?').append(query)
             val request = Request.Builder()
                 .url(url.toString())
-                .header("Authorization", "Bearer $token")
+                .apply { if (!isApiKey) header("Authorization", "Bearer $token") }
                 .header("Accept", "application/json")
                 .build()
             client.newCall(request).execute().use { response ->

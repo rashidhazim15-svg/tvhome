@@ -47,7 +47,9 @@ $env:JAVA_HOME="C:\Program Files\Microsoft\jdk-17.0.21.21-hotspot"
 Local configuration goes in `local.properties` (git-ignored, never committed):
 
 ```properties
-# TMDB v4 read access token
+# Either TMDB credential works:
+#  - v4 read access token (long JWT, sent as a Bearer token)
+#  - v3 API key (32 hex chars, sent as the api_key parameter)
 TMDB_READ_TOKEN=...
 ```
 
