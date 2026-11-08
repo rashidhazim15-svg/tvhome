@@ -62,14 +62,32 @@ class AppRepository(private val context: Context) {
         val hidden = prefs.hiddenApps
         val order = prefs.appOrder
 
+        // The stock YouTube TV app refuses to run on this box: it requires Play
+        // services 20.34+ while the device ships 15.1.81. SmartTube is a standalone
+        // client that works without Play services, so it replaces the stock tile.
+        val smartTube = "org.smarttube.stable"
+        val hasSmartTube = isInstalled(smartTube)
+        val suppressed = if (hasSmartTube) setOf("com.google.android.youtube.tv") else emptySet()
+        val labelOverrides = if (hasSmartTube) mapOf(smartTube to "YouTube") else emptyMap()
+
+        // Vendor leftovers with launcher icons that are not usable TV apps.
+        val junk = setOf(
+            "com.android.wallpaper",
+            "com.android.gallery3d",
+            "com.android.music",
+        )
+
         val entries = found.values.mapNotNull { ai ->
             if (ai.packageName in hidden) return@mapNotNull null
+            if (ai.packageName in suppressed) return@mapNotNull null
+            if (ai.packageName in junk) return@mapNotNull null
             try {
-                val label = pm.getApplicationLabel(ai).toString()
-                val bannerDrawable: Drawable? = runCatching { pm.getApplicationBanner(ai) }.getOrNull()
-                val iconDrawable: Drawable = pm.getApplicationIcon(ai)
-                val banner = bannerDrawable?.toSafeBitmap(480, 270)
-                val icon = iconDrawable.toSafeBitmap(192, 192)
+                val label = labelOverrides[ai.packageName]
+                    ?: runCatching { pm.getApplicationLabel(ai).toString() }.getOrDefault(ai.packageName)
+                val banner = runCatching {
+                    pm.getApplicationBanner(ai)?.toSafeBitmap(480, 270)
+                }.getOrNull()
+                val icon = runCatching { pm.getApplicationIcon(ai).toSafeBitmap(192, 192) }.getOrNull()
                 AppEntry(
                     packageName = ai.packageName,
                     label = label,
@@ -89,6 +107,7 @@ class AppRepository(private val context: Context) {
         entries.filter { it.packageName !in order || order.indexOf(it.packageName) < 0 }
             .sortedBy { it.label.lowercase() }
             .forEach { ordered.add(it) }
+        android.util.Log.i("TvHomeApps", "loaded=" + ordered.size)
         ordered
     }
 
