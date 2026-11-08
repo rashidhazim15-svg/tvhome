@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">tvhome</string>
+    <string name="search">Search</string>
+    <string name="settings">Settings</string>
+    <string name="home">Home</string>
+    <string name="movies">Movies</string>
+    <string name="tv_shows">TV Shows</string>
+    <string name="apps">Apps</string>
+    <string name="your_apps">Your Apps</string>
+    <string name="trending_now">Trending Now</string>
+    <string name="play">Play</string>
+    <string name="more_info">More Info</string>
+    <string name="prayer_screensaver">Prayer Times</string>
+    <string name="aerial_screensaver">Aerial</string>
+    <string name="screensaver">tvhome Screen Saver</string>
+    <string name="control_center">Control Center</string>
+    <string name="control_center_description">Long-press Home to open Control Center: Wi-Fi, Bluetooth and recent apps. D-pad moves, Menu closes.</string>
+</resources>

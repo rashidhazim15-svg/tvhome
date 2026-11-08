@@ -1,0 +1,26 @@
+# Gradle / build output
+.gradle/
+.kotlin/
+build/
+**/build/
+captures/
+*.apk
+*.aab
+
+# Secrets — never commit
+local.properties
+*.keystore
+*.jks
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local verification artifacts
+shots/
+*.log
